@@ -28,7 +28,7 @@ const NewGameModal = (props: NewGameModalProps) => {
     <>
       <div className="flex justify-center w-full">
         <button
-          className="border border-yellow-400 py-3 px-4 rounded-full active:bg-gray-100 disabled:active:bg-white select-none"
+          className="border border-yellow-400 py-3 px-2 rounded-full active:bg-gray-100 disabled:active:bg-white select-none"
           type="button"
           onClick={() => setShowModal(true)}
         >
@@ -104,6 +104,68 @@ const NewGameModal = (props: NewGameModalProps) => {
     </>
   );
 
+}
+
+type SolutionModalProps = {
+  possibleWords: string[];
+  wordsFound: string[];
+}
+
+const SolutionModal = (props: SolutionModalProps) => {
+  const { possibleWords, wordsFound } = props;
+
+  const [showModal, setShowModal] = useState(false);
+
+  const closeOnBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      setShowModal(false);
+    }
+  };
+
+  return (
+    <>
+      <div className="flex justify-center w-full">
+        <button
+          className="border border-yellow-400 py-3 px-4 rounded-full active:bg-gray-100 disabled:active:bg-white select-none"
+          type="button"
+          onClick={() => setShowModal(true)}
+        >
+          Lösning
+        </button>
+      </div>
+      {showModal ? (
+        <>
+          <div onClick={closeOnBackdropClick} className="bg-slate-500 bg-opacity-75 transition-opacity opacity-100 flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+            <div className="relative w-auto my-6 mx-auto max-w-3xl">
+              <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full sm:p-6 dark:bg-slate-800 opacity-100 translate-y-0 sm:scale-100">
+                <button onClick={() => setShowModal(false)} aria-pressed="false" className="absolute right-4 top-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true" className="h-6 w-6 cursor-pointer dark:stroke-white">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </button>
+                <div className="flex flex-col mt-4">
+                  <div className="text-center">
+                    <h3 className="text-lg leading-6 font-medium text-slate-900 dark:text-slate-100" id="headlessui-dialog-title-:r5:">
+                      Möjliga ord
+                    </h3>
+                  </div>
+                  <div className="flex flex-col">
+                    {
+                      possibleWords.map((word, index) => (
+                        <p key={index} className={`${wordsFound.includes(word) && 'text-black'} text-red-700 text-md`}>
+                          {word}
+                        </p>
+                      ))
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      ) : null}
+    </>
+  )
 }
 
 type HintsModalProps = {
@@ -191,8 +253,8 @@ const HintsModal = (props: HintsModalProps) => {
 
 export default function Index() {
 
-  const [letters, setLetters] = useState("iolnfk");
-  const [requiredLetter, setRequiredLetter] = useState("r");
+  const [letters, setLetters] = useState("huckey");
+  const [requiredLetter, setRequiredLetter] = useState("s");
   const [possibleWords, setPossibleWords] = useState<string[]>([]);
   const [pangrams, setPangrams] = useState<string[]>([]);
   const [wordsFound, setWordsFound] = useState<string[]>([]);
@@ -249,7 +311,7 @@ export default function Index() {
   // Function to check if the pressed key is a character key
   const isCharacterKey = (key: string) => {
     // You can use regular expressions or any other method to check if the key is a character key
-    const characterKeyPattern = /^[a-zA-Z]$/;
+    const characterKeyPattern = /^[a-zA-ZåäöÅÄÖ]$/;
     return characterKeyPattern.test(key);
   };
 
@@ -351,101 +413,121 @@ export default function Index() {
     borderBottom: "calc(.75*52px) solid transparent",
   }
 
+  function scrambleLetters(event: React.MouseEvent<HTMLButtonElement>): void {
+    event.preventDefault();
+
+    const lettersArray = letters.split("");
+    const scrambledLetters = lettersArray.sort(() => Math.random() - 0.5).join("");
+    setLetters(scrambledLetters);
+  }
+
   return (
     <main className="w-screen h-screen flex justify-center">
-      <div className="flex flex-col justify-center">
-        
-        <div className="flex justify-between items-center mb-1">
-          <span className="text-base font-medium">Nybörjare</span>
-          <span className="text-sm font-medium">{wordsFound.length} / {possibleWords.length}</span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-          <div className="bg-orange-300 h-2.5 rounded-full" style={{ width: `${getProgress()}%` }}></div>
-        </div>
+      <div className="flex flex-col">
+        <div className="flex flex-col justify-center">
+          
+          <div className="flex justify-between items-center mb-1">
+            <span className="text-base font-medium">Nybörjare</span>
+            <span className="text-sm font-medium">{wordsFound.length} / {possibleWords.length}</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+            <div className="bg-orange-300 h-2.5 rounded-full" style={{ width: `${getProgress()}%` }}></div>
+          </div>
 
-        <div className="relative mt-8">
-          <h2 className="w-full flex justify-center items-center">
+          <div className="relative mt-8">
+            <h2 className="w-full flex justify-center items-center">
+              {
+                guess.split("").map((letter, index) => (
+                  <span key={index} className="text-2xl font-bold flex">{letter.toUpperCase()}</span>
+                ))
+              }
+              <span className="text-orange-300 text-4xl -mt-2 animate-blink">|</span>
+            </h2>
             {
-              guess.split("").map((letter, index) => (
-                <span key={index} className="text-2xl font-bold flex">{letter.toUpperCase()}</span>
-              ))
+              message && (
+                <div className="absolute flex justify-center w-full z-30 -mt-14">
+                  <h2 className="bg-black text-white w-fit rounded px-3 py-1">
+                    {message}
+                  </h2>
+                </div>
+              )
             }
-            <span className="text-orange-300 text-4xl -mt-2 animate-blink">|</span>
-          </h2>
-          {
-            message && (
-              <div className="absolute flex justify-center w-full z-30 -mt-14">
-                <h2 className="bg-black text-white w-fit rounded px-3 py-1">
-                  {message}
-                </h2>
-              </div>
-            )
-          }
-        </div>
-
-        <div className="flex items-center">
-          <div className="flex flex-col">
-            <div style={hex}>
-              <div style={hexTop}></div>
-              <div className="w-[45px] h-[78px] flex flex-col justify-center items-center bg-zinc-200">
-                <h2 className="text-2xl font-bold">{letters[0].toUpperCase()}</h2>
-              </div>
-              <div style={hexBottom}></div>
-            </div>
-            <div style={hex}>
-              <div style={hexTop}></div>
-              <div className="w-[45px] h-[78px] flex flex-col justify-center items-center bg-zinc-200">
-                <h2 className="text-2xl font-bold">{letters[1].toUpperCase()}</h2>
-              </div>
-              <div style={hexBottom}></div>
-            </div>
           </div>
 
-          <div className="flex flex-col">
-            <div style={hex}>
-              <div style={hexTop}></div>
-              <div className="w-[45px] h-[78px] flex flex-col justify-center items-center bg-zinc-200">
-                <h2 className="text-2xl font-bold">{letters[2].toUpperCase()}</h2>
+          <div className="flex justify-center items-center">
+            <div className="flex flex-col">
+              <div style={hex}>
+                <div style={hexTop}></div>
+                <div className="w-[45px] h-[78px] flex flex-col justify-center items-center bg-zinc-200">
+                  <h2 className="text-2xl font-bold">{letters[0].toUpperCase()}</h2>
+                </div>
+                <div style={hexBottom}></div>
               </div>
-              <div style={hexBottom}></div>
-            </div>
-            <div style={hex}>
-              <div style={hexCenterTop}></div>
-              <div className="w-[45px] h-[78px] flex flex-col justify-center items-center bg-yellow-300">
-                <h2 className="text-2xl font-bold">{requiredLetter.toUpperCase()}</h2>
+              <div style={hex}>
+                <div style={hexTop}></div>
+                <div className="w-[45px] h-[78px] flex flex-col justify-center items-center bg-zinc-200">
+                  <h2 className="text-2xl font-bold">{letters[1].toUpperCase()}</h2>
+                </div>
+                <div style={hexBottom}></div>
               </div>
-              <div style={hexCenterBottom}></div>
             </div>
-            <div style={hex}>
-              <div style={hexTop}></div>
-              <div className="w-[45px] h-[78px] flex flex-col justify-center items-center bg-zinc-200">
-                <h2 className="text-2xl font-bold">{letters[3].toUpperCase()}</h2>
-              </div>
-              <div style={hexBottom}></div>
-            </div>
-          </div>
 
-          <div className="flex flex-col">
-            <div style={hex}>
-              <div style={hexTop}></div>
-              <div className="w-[45px] h-[78px] flex flex-col justify-center items-center bg-zinc-200">
-                <h2 className="text-2xl font-bold">{letters[4].toUpperCase()}</h2>
+            <div className="flex flex-col">
+              <div style={hex}>
+                <div style={hexTop}></div>
+                <div className="w-[45px] h-[78px] flex flex-col justify-center items-center bg-zinc-200">
+                  <h2 className="text-2xl font-bold">{letters[2].toUpperCase()}</h2>
+                </div>
+                <div style={hexBottom}></div>
               </div>
-              <div style={hexBottom}></div>
+              <div style={hex}>
+                <div style={hexCenterTop}></div>
+                <div className="w-[45px] h-[78px] flex flex-col justify-center items-center bg-yellow-300">
+                  <h2 className="text-2xl font-bold">{requiredLetter.toUpperCase()}</h2>
+                </div>
+                <div style={hexCenterBottom}></div>
+              </div>
+              <div style={hex}>
+                <div style={hexTop}></div>
+                <div className="w-[45px] h-[78px] flex flex-col justify-center items-center bg-zinc-200">
+                  <h2 className="text-2xl font-bold">{letters[3].toUpperCase()}</h2>
+                </div>
+                <div style={hexBottom}></div>
+              </div>
             </div>
-            <div style={hex}>
-              <div style={hexTop}></div>
-              <div className="w-[45px] h-[78px] flex flex-col justify-center items-center bg-zinc-200">
-                <h2 className="text-2xl font-bold">{letters[5].toUpperCase()}</h2>
+
+            <div className="flex flex-col">
+              <div style={hex}>
+                <div style={hexTop}></div>
+                <div className="w-[45px] h-[78px] flex flex-col justify-center items-center bg-zinc-200">
+                  <h2 className="text-2xl font-bold">{letters[4].toUpperCase()}</h2>
+                </div>
+                <div style={hexBottom}></div>
               </div>
-              <div style={hexBottom}></div>
+              <div style={hex}>
+                <div style={hexTop}></div>
+                <div className="w-[45px] h-[78px] flex flex-col justify-center items-center bg-zinc-200">
+                  <h2 className="text-2xl font-bold">{letters[5].toUpperCase()}</h2>
+                </div>
+                <div style={hexBottom}></div>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="flex space-x-4 mt-20">
+        <div className="flex space-x-4 mt-20 w-full">
           <NewGameModal onClose={newGame} />
+          <div className="flex justify-center w-full">
+            <button
+              className="border border-yellow-400 py-3 px-4 rounded-full active:bg-gray-100 disabled:active:bg-white select-none"
+              type="button"
+              onClick={scrambleLetters}
+            >
+              Blanda
+            </button>
+          </div>
           <HintsModal possibleWords={possibleWords} pangrams={pangrams} />
+          <SolutionModal possibleWords={possibleWords} wordsFound={wordsFound} />
         </div>
       </div>
 
