@@ -18,7 +18,6 @@ export default function Index() {
 
   useEffect(() => {
     findPossibleWords();
-    getPangrams();
   }, [letters, requiredLetter]);
 
   useEffect(() => {
@@ -74,6 +73,12 @@ export default function Index() {
 
     const allPossibleWords = wordList.filter(word => word.length > 3 && word.includes(requiredLetter) && pattern.test(word));
     setPossibleWords(allPossibleWords);
+
+    const lettersArray = letters.split("");
+    const pangrams = allPossibleWords.filter((word) => 
+      word.includes(requiredLetter) && lettersArray.every((letter) => word.includes(letter))
+    )
+    setPangrams(pangrams);
   }
 
   const performGuess = () => {
@@ -112,13 +117,6 @@ export default function Index() {
 
   const getProgress = () => {
     return Math.ceil((wordsFound.length / possibleWords.length) * 100);
-  }
-
-  const getPangrams = () => {
-    const pangrams = possibleWords.filter((word) => 
-      word.includes(requiredLetter) && letters.split("").every((letter) => word.includes(letter))
-    )
-    setPangrams(pangrams);
   }
 
   const newGame = (letters: string, requiredLetter: string) => {
