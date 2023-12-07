@@ -1,255 +1,9 @@
-import { MouseEventHandler, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import { HexContainer } from "~/components/HexContainer";
+import { HintsModal } from "~/components/HintsModal";
+import { NewGameModal } from "~/components/NewGameModal";
+import { SolutionModal } from "~/components/SolutionModal";
 import { wordList } from '~/svenska-ord';
-
-type NewGameModalProps = {
-  onClose: (letters: string, requiredLetter: string) => void;
-}
-
-const NewGameModal = (props: NewGameModalProps) => {
-  const { onClose } = props;
-
-  const [letters, setLetters] = useState("");
-  const [requiredLetter, setRequiredLetter] = useState("");
-  const [showModal, setShowModal] = useState(false);
-
-  const closeOnBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) {
-      setShowModal(false);
-    }
-  };
-
-  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    onClose(letters, requiredLetter);
-    setShowModal(false);
-  }
-
-  return (
-    <>
-      <div className="flex justify-center w-full">
-        <button
-          className="border border-yellow-400 py-3 px-2 rounded-full active:bg-gray-100 disabled:active:bg-white select-none"
-          type="button"
-          onClick={() => setShowModal(true)}
-        >
-          Nytt spel
-        </button>
-      </div>
-      {showModal ? (
-        <>
-          <div onClick={closeOnBackdropClick} className="bg-slate-500 bg-opacity-75 transition-opacity opacity-100 flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
-            <div className="relative w-auto my-6 mx-auto max-w-3xl">
-              <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full sm:p-6 dark:bg-slate-800 opacity-100 translate-y-0 sm:scale-100">
-                <button onClick={() => setShowModal(false)} aria-pressed="false" className="absolute right-4 top-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true" className="h-6 w-6 cursor-pointer dark:stroke-white">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                </button>
-                <div>
-                  <div className="text-center">
-                    <h3 className="text-lg leading-6 font-medium text-slate-900 dark:text-slate-100" id="headlessui-dialog-title-:r5:">
-                      Välj bokstäver
-                    </h3>
-                    <div className="mt-8">
-                      <form onSubmit={onSubmit} className="flex flex-col space-y-4">
-                        <div className="flex flex-col">
-                          <label htmlFor="letters" className="text-sm font-medium text-gray-700 dark:text-slate-100">
-                            Bokstäver
-                          </label>
-                          <div className="mt-1">
-                            <input
-                              type="text"
-                              name="letters"
-                              id="letters"
-                              className="outline-none shadow-sm focus:ring-yellow-500 focus:border-yellow-500 block w-full sm:text-sm border-gray-300 rounded-md dark:bg-slate-700 dark:border-slate-700 dark:text-slate-100"
-                              placeholder="iolnfk"
-                              value={letters}
-                              onChange={(event) => setLetters(event.target.value)}
-                            />
-                          </div>
-                        </div>
-                        <div className="flex flex-col mt-2">
-                          <label htmlFor="requiredLetter" className="text-sm font-medium text-gray-700 dark:text-slate-100">
-                            Mittenbokstav
-                          </label>
-                          <div className="mt-1">
-                            <input
-                              type="text"
-                              name="requiredLetter"
-                              id="requiredLetter"
-                              className="outline-none shadow-sm focus:ring-yellow-500 focus:border-yellow-500 block w-full sm:text-sm border-gray-300 rounded-md dark:bg-slate-700 dark:border-slate-700 dark:text-slate-100"
-                              placeholder="r"
-                              value={requiredLetter}
-                              onChange={(event) => setRequiredLetter(event.target.value)}
-                            />
-                          </div>
-                        </div>
-                        <div className="flex justify-center mt-2">
-                          <button
-                            type="submit"
-                            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-yellow-400 hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
-                          >
-                            Starta
-                          </button>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </>
-      ) : null}
-    </>
-  );
-
-}
-
-type SolutionModalProps = {
-  possibleWords: string[];
-  wordsFound: string[];
-}
-
-const SolutionModal = (props: SolutionModalProps) => {
-  const { possibleWords, wordsFound } = props;
-
-  const [showModal, setShowModal] = useState(false);
-
-  const closeOnBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) {
-      setShowModal(false);
-    }
-  };
-
-  return (
-    <>
-      <div className="flex justify-center w-full">
-        <button
-          className="border border-yellow-400 py-3 px-4 rounded-full active:bg-gray-100 disabled:active:bg-white select-none"
-          type="button"
-          onClick={() => setShowModal(true)}
-        >
-          Lösning
-        </button>
-      </div>
-      {showModal ? (
-        <>
-          <div onClick={closeOnBackdropClick} className="bg-slate-500 bg-opacity-75 transition-opacity opacity-100 flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
-            <div className="relative w-auto my-6 mx-auto max-w-3xl">
-              <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full sm:p-6 dark:bg-slate-800 opacity-100 translate-y-0 sm:scale-100">
-                <button onClick={() => setShowModal(false)} aria-pressed="false" className="absolute right-4 top-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true" className="h-6 w-6 cursor-pointer dark:stroke-white">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                </button>
-                <div className="flex flex-col mt-4">
-                  <div className="text-center">
-                    <h3 className="text-lg leading-6 font-medium text-slate-900 dark:text-slate-100" id="headlessui-dialog-title-:r5:">
-                      Möjliga ord
-                    </h3>
-                  </div>
-                  <div className="flex flex-col">
-                    {
-                      possibleWords.map((word, index) => (
-                        <p key={index} className={`${wordsFound.includes(word) && 'text-black'} text-red-700 text-md`}>
-                          {word}
-                        </p>
-                      ))
-                    }
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </>
-      ) : null}
-    </>
-  )
-}
-
-type HintsModalProps = {
-  possibleWords: string[];
-  pangrams: string[];
-}
-
-const HintsModal = (props: HintsModalProps) => {
-  const { possibleWords, pangrams } = props;
-
-  const [showModal, setShowModal] = useState(false);
-
-  const closeOnBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) {
-      setShowModal(false);
-    }
-  };
-
-  return (
-    <>
-      <div className="flex justify-center w-full">
-        <button
-          className="border border-yellow-400 py-3 px-4 rounded-full active:bg-gray-100 disabled:active:bg-white select-none"
-          type="button"
-          onClick={() => setShowModal(true)}
-        >
-          Ledtrådar
-        </button>
-      </div>
-      {showModal ? (
-        <>
-          <div onClick={closeOnBackdropClick} className="bg-slate-500 bg-opacity-75 transition-opacity opacity-100 flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
-            <div className="relative w-auto my-6 mx-auto max-w-3xl">
-              <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full sm:p-6 dark:bg-slate-800 opacity-100 translate-y-0 sm:scale-100">
-                <button onClick={() => setShowModal(false)} aria-pressed="false" className="absolute right-4 top-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true" className="h-6 w-6 cursor-pointer dark:stroke-white">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                </button>
-                <div>
-                  <div className="text-center">
-                    <h3 className="text-lg leading-6 font-medium text-slate-900 dark:text-slate-100" id="headlessui-dialog-title-:r5:">
-                      Dagens ledtrådar!
-                    </h3>
-                    <div className="mt-2">
-                      <div className="p-2">
-                        <p className="text-lg font-semithin dark:text-slate-100">
-                          Detta pussel har {possibleWords.length} ord.
-                        </p>
-                        <p className="text-lg font-semithin dark:text-slate-100">
-                          Det finns {pangrams.length} pangram.
-                        </p>
-                      </div>
-                      <h2 className="text-xl font-medium pb-1 dark:text-slate-100">
-                        Antal ord för varje antal bokstäver
-                      </h2>
-                      <div className="how-to-section pb-3">
-                        <p className="font-semithin dark:text-slate-100">
-                          Fyra bokstäver: <span className="font-medium">{possibleWords.filter(word => word.length === 4).length}</span>
-                        </p>
-                        <p className="font-semithin dark:text-slate-100">
-                          Fem bokstäver: <span className="font-medium">{possibleWords.filter(word => word.length === 5).length}</span>
-                        </p>
-                        <p className="font-semithin dark:text-slate-100">
-                          Sex bokstäver: <span className="font-medium">{possibleWords.filter(word => word.length === 6).length}</span>
-                        </p>
-                        <p className="font-semithin dark:text-slate-100">
-                          Sju bokstäver: <span className="font-medium">{possibleWords.filter(word => word.length === 7).length}</span>
-                        </p>
-                        <p className="font-semithin dark:text-slate-100">
-                          Åtta eller fler bokstäver: <span className="font-medium">{possibleWords.filter(word => word.length >= 8).length}</span>
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </>
-      ) : null}
-    </>
-  );
-};
 
 export default function Index() {
 
@@ -361,8 +115,10 @@ export default function Index() {
   }
 
   const getPangrams = () => {
-    const pattern = new RegExp(`^(?=.*${letters[0]})(?=.*${letters[1]})(?=.*${letters[2]})(?=.*${letters[3]})(?=.*${letters[4]})(?=.*${letters[5]})(?=.*${requiredLetter})[${letters}${requiredLetter}]*$`);
-    setPangrams(possibleWords.filter(word => pattern.test(word)));
+    const pangrams = possibleWords.filter((word) => 
+      word.includes(requiredLetter) && letters.split("").every((letter) => word.includes(letter))
+    )
+    setPangrams(pangrams);
   }
 
   const newGame = (letters: string, requiredLetter: string) => {
@@ -371,46 +127,6 @@ export default function Index() {
     setWordsFound([]);
     setGuess("");
     setMessage(null);
-  }
-
-  const hex = {
-    display: "flex",
-    marginTop: "64px",
-    marginRight: "-12px",
-    marginLeft: "-5px",
-    marginBottom: "-57px",
-  }
-
-  const hexTop = {
-    display: "flex",
-    width: 0,
-    borderRight: "calc(30px * .75) solid #e4e4e7",
-    borderTop: "calc(.75*52px) solid transparent",
-    borderBottom: "calc(.75*52px) solid transparent",
-  }
-
-  const hexBottom = {
-    display: "flex",
-    width: 0,
-    borderLeft: "calc(30px * .75) solid #e4e4e7",
-    borderTop: "calc(.75*52px) solid transparent",
-    borderBottom: "calc(.75*52px) solid transparent",
-  }
-
-  const hexCenterTop = {
-    display: "flex",
-    width: 0,
-    borderRight: "calc(30px * .75) solid #fde047",
-    borderTop: "calc(.75*52px) solid transparent",
-    borderBottom: "calc(.75*52px) solid transparent",
-  }
-
-  const hexCenterBottom = {
-    display: "flex",
-    width: 0,
-    borderLeft: "calc(30px * .75) solid #fde047",
-    borderTop: "calc(.75*52px) solid transparent",
-    borderBottom: "calc(.75*52px) solid transparent",
   }
 
   function scrambleLetters(event: React.MouseEvent<HTMLButtonElement>): void {
@@ -422,7 +138,7 @@ export default function Index() {
   }
 
   return (
-    <main className="w-screen h-screen flex justify-center">
+    <main className="w-screen h-screen flex justify-center pt-2">
       <div className="flex flex-col">
         <div className="flex flex-col justify-center">
           
@@ -453,67 +169,9 @@ export default function Index() {
               )
             }
           </div>
-
-          <div className="flex justify-center items-center">
-            <div className="flex flex-col">
-              <div style={hex}>
-                <div style={hexTop}></div>
-                <div className="w-[45px] h-[78px] flex flex-col justify-center items-center bg-zinc-200">
-                  <h2 className="text-2xl font-bold">{letters[0].toUpperCase()}</h2>
-                </div>
-                <div style={hexBottom}></div>
-              </div>
-              <div style={hex}>
-                <div style={hexTop}></div>
-                <div className="w-[45px] h-[78px] flex flex-col justify-center items-center bg-zinc-200">
-                  <h2 className="text-2xl font-bold">{letters[1].toUpperCase()}</h2>
-                </div>
-                <div style={hexBottom}></div>
-              </div>
-            </div>
-
-            <div className="flex flex-col">
-              <div style={hex}>
-                <div style={hexTop}></div>
-                <div className="w-[45px] h-[78px] flex flex-col justify-center items-center bg-zinc-200">
-                  <h2 className="text-2xl font-bold">{letters[2].toUpperCase()}</h2>
-                </div>
-                <div style={hexBottom}></div>
-              </div>
-              <div style={hex}>
-                <div style={hexCenterTop}></div>
-                <div className="w-[45px] h-[78px] flex flex-col justify-center items-center bg-yellow-300">
-                  <h2 className="text-2xl font-bold">{requiredLetter.toUpperCase()}</h2>
-                </div>
-                <div style={hexCenterBottom}></div>
-              </div>
-              <div style={hex}>
-                <div style={hexTop}></div>
-                <div className="w-[45px] h-[78px] flex flex-col justify-center items-center bg-zinc-200">
-                  <h2 className="text-2xl font-bold">{letters[3].toUpperCase()}</h2>
-                </div>
-                <div style={hexBottom}></div>
-              </div>
-            </div>
-
-            <div className="flex flex-col">
-              <div style={hex}>
-                <div style={hexTop}></div>
-                <div className="w-[45px] h-[78px] flex flex-col justify-center items-center bg-zinc-200">
-                  <h2 className="text-2xl font-bold">{letters[4].toUpperCase()}</h2>
-                </div>
-                <div style={hexBottom}></div>
-              </div>
-              <div style={hex}>
-                <div style={hexTop}></div>
-                <div className="w-[45px] h-[78px] flex flex-col justify-center items-center bg-zinc-200">
-                  <h2 className="text-2xl font-bold">{letters[5].toUpperCase()}</h2>
-                </div>
-                <div style={hexBottom}></div>
-              </div>
-            </div>
-          </div>
         </div>
+
+        <HexContainer letters={letters.split("")} requiredLetter={requiredLetter} />
 
         <div className="flex space-x-4 mt-20 w-full">
           <NewGameModal onClose={newGame} />
